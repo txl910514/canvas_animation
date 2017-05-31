@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="renderer" content="webkit">
+    <title>Title</title>
+    <style>
+       .position {
+           position: absolute;
+           top: 0;
+           right: 0;
+           bottom: 0;
+           left: 0;
+           background: #000;
+       }
+        .box {
+            width: 70%;
+            height: 50%;
+            background: red;
+            position: absolute;
+            /*left: 50%;*/
+            /*top:50%;*/
+            /*margin-top: -25%;*/
+            /*margin-left: -35%;*/
+        }
+    </style>
+</head>
+<body>
+<div class="position">
+    <div class="box">
+        <div class="absolute"></div>
+        <div class="alpha"></div>
+        <div class="beta"></div>
+        <div class="gamma"></div>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="jslib/jquery.min.js"></script>
+<script type="text/javascript">
+  var box = document.querySelector('.box');
+  var position = document.querySelector('.position')
+  var maxX = position.clientWidth  - box.clientWidth;
+  var maxY = position.clientHeight - box.clientHeight;
+  window.addEventListener("deviceorientation", function(event) {
+    console.log(event)
+    var x = event.beta;  // In degree in the range [-180,180] x轴的呃旋转角度
+    var y = event.gamma; // In degree in the range [-90,90] y轴的旋转角度
+    if (x >  90) { x =  90};
+    if (x < -90) { x = -90};
+
+    // To make computation easier we shift the range of
+    // x and y to [0,180]
+    x += 90;
+    y += 90
+    box.style.top  = (maxY*x/180 - 10) + "px";
+    box.style.left = (maxX*y/180 - 10) + "px";
+    $('.absolute').text('absolute：' + event.absolute)
+    $('.alpha').text('alpha：' + event.alpha)
+    $('.beta').text('beta：' + event.beta)
+    $('.gamma').text('gamma：' + event.gamma)
+    // $('.box').css('transform','rotateY('+event.gamma+'deg) rotateX('+event.beta+'deg)')
+    // $('.box').css('transform','rotateY('+event.gamma+'deg) rotateX('+event.beta+'deg) rotateZ('+event.alpha+'deg)')
+    // 处理event.alpha、event.beta及event.gamma
+  }, false);
+</script>
+</html>
