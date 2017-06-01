@@ -8,151 +8,69 @@
   <meta http-equiv="Expires" content="0">
   <title></title>
   <style>
-    div#camera{
-      width: 500px;
-      height: 500px;
-      /*outline: 1px solid black;*/
-      margin:100px auto;
-      position: relative;
-      perspective: 1000px;
-    }
-    div#camera>div {
-      width: 400px;
-      height: 400px;
-      position: absolute;
-      top:calc(50% - 200px);
-      left:calc(50% - 200px);
-      outline: 1px solid black;
-      transition: all 1s linear;
-    }
-    .one {
-      background: red;
-      transform: rotateY(0deg) translateZ(200px);
-      z-index: 99;
-      animation: dy_an1 10s infinite;
-    }
-    .two {
-      background: #865422;
-      transform: rotateY(90deg) translateZ(200px);
-      animation: dy_an2 10s infinite;
-    }
-    .three {
-      background: #892;
-      transform: rotateY(180deg) translateZ(200px);
-      animation: dy_an3 10s infinite;
-    }
-    .four {
-      background: #128691;
-      transform: rotateY(270deg) translateZ(200px);
-      animation: dy_an4 10s infinite;
-    }
-    .five {
-      background: transparent;
-      transform: rotateX(90deg) translateZ(200px);
-      opacity: 0;
-    }
-    .six {
-      background: transparent;
-      transform: rotateX(270deg) translateZ(200px);
-      opacity: 0;
-    }
-    @keyframes dy_an1 {
-      0% {
-        transform: rotateY(0deg) translateZ(200px);
-      }
-      25% {
-        transform: rotateY(90deg) translateZ(200px);
-        z-index: 1;
-      }
-      50% {
-        transform: rotateY(180deg) translateZ(200px);
-        z-index: 1;
-      }
-      75% {
-        transform: rotateY(270deg) translateZ(200px);
-        z-index: 1;
-      }
-      100% {
-        transform: rotateY(360deg) translateZ(200px);
-        z-index: 99;
-      }
-    }
-    @keyframes dy_an2 {
-      0% {
-        transform: rotateY(90deg) translateZ(200px);
-        z-index: 1;
-      }
-      25% {
-        transform: rotateY(180deg) translateZ(200px);
-        z-index: 1;
-      }
-      50% {
-        transform: rotateY(270deg) translateZ(200px);
-        z-index: 1;
-      }
-      75% {
-        transform: rotateY(360deg) translateZ(200px);
-        z-index: 99;
-      }
-      100% {
-        transform: rotateY(450deg) translateZ(200px);
-        z-index: 1;
-      }
-    }
-    @keyframes dy_an3 {
-      0% {
-        transform: rotateY(180deg) translateZ(200px);
-        z-index: 1;
-      }
-      25% {
-        transform: rotateY(270deg) translateZ(200px);
-        z-index: 1;
-      }
-      50% {
-        transform: rotateY(360deg) translateZ(200px);
-        z-index: 99;
-      }
-      75% {
-        transform: rotateY(450deg) translateZ(200px);
-        z-index: 1;
-      }
-      100% {
-        transform: rotateY(540deg) translateZ(200px);
-        z-index: 1;
-      }
-    }
-    @keyframes dy_an4 {
-      0% {
-        transform: rotateY(270deg) translateZ(200px);
-        z-index: 1;
-      }
-      25% {
-        transform: rotateY(360deg) translateZ(200px);
-        z-index: 99;
-      }
-      50% {
-        transform: rotateY(450deg) translateZ(200px);
-        z-index: 1;
-      }
-      75% {
-        transform: rotateY(540deg) translateZ(200px);
-        z-index: 1;
-      }
-      100% {
-        transform: rotateY(630deg) translateZ(200px);
-        z-index: 1;
-      }
-    }
+
   </style>
 </head>
 <body>
-<div id="camera">
-  <div class="one">1</div>
-  <div class="two">2</div>
-  <div class="three">3</div>
-  <div class="four">4</div>
-  <!--<div class="five">5</div>-->
-  <!--<div class="six">6</div>-->
-</div>
+<canvas id="canvas" width='500' height="500">
+  <P>you browser not support canvas!</P>
+</canvas>
 </body>
+<script>
+  window.onload = function(){
+    var canvas = document.getElementById('canvas'),  //获取canvas元素
+      context = canvas.getContext('2d'),           //获取画图环境，指明为2d
+      centerX = canvas.width/2,                    //Canvas中心点x轴坐标
+      centerY = canvas.height/2,                   //Canvas中心点y轴坐标
+      rad = Math.PI*2/100,                         //将360度分成100份，那么每一份就是rad度
+      speed = 0;                                  //加载的快慢就靠它了
+
+    //绘制蓝色外圈
+    function blueCircle(n){
+      context.save();
+      context.beginPath();
+      context.strokeStyle = "#49f";
+      context.lineWidth = 1;
+      context.arc(centerX, centerY, 100 , -Math.PI/2, -Math.PI/2 + n*rad, false);
+      context.stroke();
+      context.restore();
+    }
+
+    //绘制白色外圈
+    function whiteCircle(){
+      context.save();
+      context.beginPath();
+      context.strokeStyle = "#A5DEF1";
+      context.lineWidth = 12;
+      context.arc(centerX, centerY, 100 , 0, Math.PI*2, false);
+      context.stroke();
+      context.closePath();
+      context.restore();
+    }
+
+    //百分比文字绘制
+    function text(n){
+      context.save();
+      context.fillStyle = "#984237";
+      context.font = "40px Arial";
+      context.textAlign = "center";
+      context.textBaseline = "middle";
+      context.fillText(n.toFixed(0)+"%", centerX, centerY);
+      context.restore();
+    }
+
+    //动画循环
+    (function drawFrame(){
+      window.requestAnimationFrame(drawFrame);
+      context.clearRect(0, 0, canvas.width, canvas.height);
+
+      whiteCircle();
+      text(speed);
+      blueCircle(speed);
+
+      if(speed > 100) speed = 0;
+      speed += 0.1;
+    }());
+  }
+</script>
 </html>
