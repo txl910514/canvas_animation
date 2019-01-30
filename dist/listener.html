@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<title>Title</title>
+	<style>
+		* {
+            margin: 0;
+            padding: 0;
+        }
+        canvas {
+            background: beige;
+            margin-left: 50px;
+        }
+    </style>
+</head>
+
+<body>
+	<canvas id="canvas" width="500" height="500"></canvas>
+	<script type="text/javascript" src="js/journal_js/utils.js"></script>
+	<script>
+		window.onload = function() {
+			var canvas = document.getElementById('canvas');
+			var ctx = canvas.getContext("2d");
+			var mouse;
+			var start = 0;
+			//将canvas传入，该方法会返回一个包含属性x和y的对象
+			//定义的执行函数add
+			function add(event) {
+				mouse = utils.captureRect(canvas, event);
+				if (!start) {
+					ctx.beginPath();
+					ctx.strokeStyle = "red";
+					ctx.lineWidth = 1;
+					ctx.arc(mouse.x, mouse.y, 1, 0, 2 * Math.PI);
+					ctx.stroke();
+					ctx.moveTo(mouse.x, mouse.y);
+					start++;
+				} else {
+					ctx.lineTo(mouse.x, mouse.y);
+					ctx.stroke();
+				}
+			}
+			canvas.addEventListener('click', add, false);
+			//移除事件mousedown
+			// canvas.removeEventListener('mousedown', add, false)
+			//定义键盘事件
+			function onKeyboard(event) {
+				switch (event.keyCode) {
+					case 38:
+						console.log('up!');
+						break;
+					case 40:
+						console.log('down!');
+						break;
+					case 37:
+						console.log('left!');
+						break;
+					case 39:
+						console.log('right!');
+						break;
+					default:
+						console.log(event.keyCode);
+				}
+			}
+			//为window对象绑定键盘事件
+			window.addEventListener('keydown', onKeyboard, false);
+
+			function ontouchStart(event) {
+				mouse = utils.captureTouch(canvas, event)
+				console.log(mouse)
+			}
+			canvas.addEventListener('touchstart', ontouchStart, false);
+			canvas.addEventListener('touchend', ontouchStart, false);
+			canvas.addEventListener('touchmove', ontouchStart, false);
+		}
+	</script>
+</body>
+
+</html>

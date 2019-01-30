@@ -16,7 +16,7 @@
 </head>
 <body>
 <canvas id="canvas" width="500" height="500"></canvas>
-<script type="text/javascript" src="journal_js/utils.js"></script>
+<script type="text/javascript" src="js/journal_js/utils.js"></script>
 <script>
   window.onload = function(){
     var canvas = document.getElementById('canvas');
@@ -27,7 +27,6 @@
     //定义的执行函数add
     function add(event){
       mouse = utils.captureRect(canvas, event);
-      return false;
       if (!start) {
         ctx.beginPath();
         ctx.strokeStyle = "red";

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<title>Title</title>
+</head>
+
+<body>
+	<canvas id='canvas' width="500" height="500" style="background:#ccc;">
+		you browser not support canvas
+	</canvas>
+	<script type="text/javascript" src="js/journal_js/utils.js"></script>
+	<script type="text/javascript" src="js/journal_js/arrow.js"></script>
+	<script>
+		window.onload = function() {
+			var canvas = document.getElementById('canvas');
+			var context = canvas.getContext('2d');
+			var centerX = canvas.width / 2;
+			var centerY = canvas.height / 2;
+			var arrow = new Arrow();
+			var mouse;
+			arrow.x = centerX;
+			arrow.y = centerY;
+			arrow.draw(context)
+
+			function add(event) {
+				mouse = utils.captureRect(canvas, event);
+				context.clearRect(0, 0, canvas.width, canvas.height);
+				//获取dy,dx值
+				var dx = mouse.x - arrow.x,
+					dy = mouse.y - arrow.y;
+				//设置旋转角度
+				arrow.rotation = Math.atan2(dy, dx);
+				arrow.draw(context)
+			}
+			canvas.addEventListener('mousemove', add, false);
+		}
+	</script>
+</body>
+
+</html>

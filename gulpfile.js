@@ -1,241 +1,225 @@
-// 引入 gulp
-var gulp = require('gulp'),
-	yargs = require('yargs').argv, //获取gulp命令后传入的参数
-	template = require('gulp-template'), // 模板
-	livereload = require('gulp-livereload'), //与服务器同步刷新
-	browserSync = require('browser-sync'), // 启动服务 文件修改实时同步到浏览器
-	pkg = require('gulp-packages')(gulp, [
-		'autoprefixer', //浏览器前缀
-		'cache', //缓存
-		'clean-css', //压缩css
-		'file-include',
-		'filter',
-		'htmlmin',
-		'if',
-		'imagemin', //压缩图片
-		'main-bower-files',
-		'match',
-		'plumber',
-		'rename', //重命名
-		'rev',
-		'rev-replace',
-		'sass',
-		'uglify', //压缩js
-		'notify',
-		'useref'
-	]),
-	Q = require('q'),
-	del = require('del'),
-	pathConfig = {
-		src: 'src/',
-		rev: 'rev'
-	},
-	manifest = {
-		vendor: 'manifest.vendor.json',
-		html: 'manifest.html.json',
-		css: 'manifest.css.json',
-		img: 'manifest.img.json',
-		js: 'manifest.js.json'
-	},
-	compress = false,
-	img = false,
-	js = false,
-	version = new Date().getTime(),
-	api = require('./url.json'),
-	mkRev = function (stream, manifest) {
-		return stream
-			.pipe(pkg.rev())
-			.pipe(pkg.rename(function (file) {
-				file.extname += '?rev=' + version + /\-(\w+)(\.|$)/.exec(file.basename)[1];
-				if (/\-(\w+)\./.test(file.basename)) {
-					file.basename = file.basename.replace(/\-(\w+)\./, '.');
-				};
-				if (/\-(\w+)$/.test(file.basename)) {
-					file.basename = file.basename.replace(/\-(\w+)$/, '');
-				};
-			}))
-			.pipe(pkg.rev.manifest(manifest, {
-				merge: true
-			}))
-			.pipe(gulp.dest("./rev"));
-	};
-if (yargs.pub) {
-	switch (yargs.pub) {
-		// 正式环境
-		case "url":
-			pathConfig.dist = 'hos_dp/';
-			break;
-		//测试环境
-		case "test":
-			pathConfig.dist = 'hos_dp/';
-			break;
-	}
-};
-var condition = function (file) {
-	// TODO: add business logic
-	var file_path = file.history[0].replace(file.cwd+'/', '');
-	if(file_path === pathConfig.src + 'js/jslib/underscore.js') {
-		return false;
-	}
-  else if(file_path === pathConfig.src + 'js/gq/1.mp3') {
-    return false;
-  }
-	else {
-		return true;
-	}
-};
-var js_uglify = function(file) {
-	if (yargs.pub === 'url') {
-		var file_path = file.history[0].replace(file.cwd+'/', '');
-		var indexOf =  file_path.indexOf('.mp3');
-		if(indexOf > -1) {
-			return false;
-		}
-		else {
-			return true;
-		}
-	}
-	else {
-		return false;
-	}
+/**
+ * @description: gulp配置文件
+ * @author: guang.shi <https://blog.csdn.net/guang_s> 
+ * @date: 2018-12-13 17:53:40 
+ * 
+ * @task: npm run dev       开发环境
+ * @task: npm run build     生产环境（打包）
+ * @task: gulp uglify_check 检查js语法错误
+ */
+'use strict';
 
-};
-gulp.task('server', function () {
-	console.log(yargs.p);
-	yargs.p = yargs.p || 3000;
+var gulp = require('gulp');
+var path = require('path');
+var fs = require('fs');                     // 创建文件
+var babel = require('gulp-babel');          // 编译es6
+var htmltpl = require('gulp-html-tpl');     // 引用html模板
+var artTemplate = require('art-template');  // 模板渲染
+var concat = require('gulp-concat');        // 合并文件
+var rename = require('gulp-rename');        // 重命名
+var clean = require('gulp-clean');          // 清空文件夹
+var gulpif = require('gulp-if');            // 条件判断
+var uglify = require('gulp-uglify');        // js压缩
+var pump = require('pump');
+var csso = require('gulp-csso');            // css压缩
+var less = require('gulp-less');	        // less编译
+var autoprefixer = require('gulp-autoprefixer');	// 自动添加CSS前缀
+var htmlmin = require('gulp-htmlmin');      // html压缩
+var imagemin = require('gulp-imagemin');    // 图片压缩
+var cache = require('gulp-cache');          // 图片缓存（只压缩修改的图片）
+var rev = require('gulp-rev-dxb');          // 生成版本号清单    
+var revCollector = require('gulp-rev-collector-dxb');   // 替换成版本号文件
+var browserSync = require('browser-sync').create();	    // 用来打开一个浏览器
+var watch = require('gulp-watch');          // 监听文件（修改、新建、删除）
+var runSequence = require('run-sequence');  // 按顺序执行task
+
+// 路径
+var html_path = ['src/html/**/*.html', 'src/common/**/*.html'];
+var html_main_path = ['src/html/**/*.html'];
+var js_libs_path = 'src/libs/**/*.js';
+var js_main_path = ['src/js/**/*.js', 'src/utils/**/*.js'];
+var css_libs_path = 'src/libs/**/*.css';
+var css_main_path = 'src/css/**/*.css';
+var images_path = ['src/images/**', 'favicon.ico'];
+var fonts_path = 'src/libs/**/fonts/**';
+
+// 设置环境变量
+var env = 'dev';    // 用于执行gulp任务时的判断
+function set_env(type){
+    env = type || 'dev';
+    // 生成env.js文件，用于开发页面时，判断环境
+    fs.writeFile("dist/env.js", 'export default ' + env + ';', function(err){
+        err && console.log(err);
+    });
+}
+
+// html模板处理
+gulp.task('html', function() {
+    return gulp.src(html_main_path)
+        .pipe(htmltpl({
+            tag: 'template',
+            paths: ['src/common'],
+            engine: function(template, data) {
+                return template && artTemplate.compile(template)(data);
+            },
+            data: {     //初始化数据
+                header: false,
+                g2: false
+            }
+        }))
+        .pipe(gulp.dest('dist'));
+});
+
+// 打包js
+gulp.task('js_libs', function(){
+    return gulp.src(js_libs_path)
+        .pipe(rename({
+            dirname: '' // 清空路径
+        }))
+        .pipe(gulp.dest('dist/js'));
+});
+gulp.task('js_main', ['uglify_check'], function(){
+    return gulp.src(js_main_path)
+        // .pipe(concat('main.min.js'))    // 合并文件并命名
+        .pipe(babel())                  // 编译es6语法
+        .pipe(gulpif(env==='build', uglify()))  // 判断是否压缩js
+        .pipe(gulp.dest('dist/js'));
+});
+/**
+ * @description 检查压缩JS时的错误，作为'js_main'的依赖执行。
+ * 
+ * 1、解决js压缩出错的问题
+ * 2、解决修改的代码有语法错误时，服务会终止的问题
+ */
+gulp.task('uglify_check', function (cb) {
+    pump([
+        gulp.src(js_main_path),
+        babel(),
+        uglify(),
+    ], cb);
+});
+
+// 打包css
+gulp.task('css_libs', function(){
+    return gulp.src(css_libs_path)
+        .pipe(rename({ dirname: '' }))
+        .pipe(gulp.dest('dist/css'));
+});
+gulp.task('css_main', function(){
+    return gulp.src(css_main_path)
+        .pipe(less())           // 编译less
+        .on('error', function(err) {    // 解决编译出错，监听被阻断的问题
+            console.log('Less Error!', err.message);
+            this.end();
+        })
+		.pipe(autoprefixer({
+            browsers: ['last 2 versions'],
+            cascade: false      // 是否美化
+        }))
+        .pipe(concat('main.min.css'))
+        .pipe(gulpif(env==='build', csso()))    // 判断是否压缩css
+        .pipe(gulp.dest('dist/css'));
+});
+
+// 打包其他资源
+gulp.task('images', function () {
+    return gulp.src(images_path)
+        .pipe(rename({ dirname: '' }))
+        .pipe(gulpif(env==='dev', cache(imagemin({
+            optimizationLevel: 5,   // 取值范围：0-7（优化等级），默认：3  
+            progressive: true,      // 无损压缩jpg图片，默认：false 
+            interlaced: true,       // 隔行扫描gif进行渲染，默认：false 
+            multipass: true         // 多次优化svg直到完全优化，默认：false 
+        }))))
+        .pipe(gulp.dest('dist/images'));
+});
+gulp.task('fonts', function () {
+    return gulp.src(fonts_path)
+        .pipe(rename({ dirname: '' }))
+        .pipe(gulp.dest('dist/fonts'));
+});
+gulp.task('cache.clear', function(){
+    cache.clearAll();
+});
+
+// 生成版本号清单
+gulp.task('rev', function() {
+    return gulp.src(['dist/js/**', 'dist/css/**'])
+        .pipe(rev())
+        .pipe(rev.manifest())
+        .pipe(gulp.dest("./"));
+});
+// 添加版本号（路径替换）
+gulp.task('set_version', function() {
+    return gulp.src(['rev-manifest.json', 'dist/*.html'])
+        .pipe(revCollector())   // 根据.json文件 执行文件内js/css名的替换
+        .pipe(gulpif(env==='build', htmlmin({ 
+            removeComments: true,       // 清除HTML注释
+            collapseWhitespace: true,   // 压缩HTML
+            minifyJS: true,             // 压缩页面JS
+            minifyCSS: true             // 压缩页面CSS
+        })))
+        .pipe(gulp.dest('dist'));
+});
+// 生成版本文件
+gulp.task('version.txt', function () {
+    var buf = `{ "BUILD_VERSION": "", "BUILD_URL": "" }`;
+    fs.writeFile("dist/version.txt", buf, function(err){
+        err && console.log(err);
+    });
+});
+
+// 清空dist文件夹
+gulp.task('clean', function(){
+	return gulp.src(['dist/*'])
+		.pipe(clean());
+});
+
+// 启本地服务，并打开浏览器
+gulp.task('browser', function(){
 	browserSync.init({
-		server: {
-			baseDir: pathConfig.dist,
-			index: 'index.html'
-		},
-		port: yargs.p,
-		browser: ["chrome"]
-	});
+        server: 'dist'    // 访问目录，自动指向该目录下的 index.html 文件
+        // proxy: "你的域名或IP"    // 设置代理
+    });
 });
-gulp.task('setValue', function () {
-	if (yargs.pub) {
-		switch (yargs.pub) {
-			// 正式环境
-			case "url":
-				console.log('开始代码压缩');
-				compress = true;
-				img = true;
-				js = true;
-				api = require('./url.json');
-				break;
-				//测试环境
-			case "test":
-				api = require('./testurl.json');
-				break;
-		}
-	};
-	if (yargs.w) {
-		gulp.start('watch');
-	};
-	if (yargs.s) {
-		gulp.start('server');
-	};
+gulp.task('browser_reload', function(){
+	browserSync.reload();
 });
-gulp.task('del-dist', function () {
-	return del([
-		pathConfig.dist,
-		pathConfig.dist + 'index.html',
-		pathConfig.rev
-	]);
-});
-gulp.task('build-dist-img', function () {
-	return mkRev(gulp.src([pathConfig.src + "**/images/*.*", pathConfig.src + "**/images/**/*.*"])
-		.pipe(pkg.cache(pkg.if(img, pkg.imagemin({
-			progressive: true,
-			interlaced: true
-		}))))
-		.pipe(gulp.dest(pathConfig.dist))
-		.pipe(browserSync.reload({
-			stream: true
-		}))
-		.pipe(pkg.rename(function (file) {
-			file.dirname = file.dirname;
-		})), manifest.img);
-});
-// 编译Sass
-gulp.task('build-dist-sass', function () {
-	return mkRev(gulp.src(pathConfig.src + "**/css/*.scss")
-		.pipe(pkg.sass({
-			outputStyle: compress ? 'compressed' : 'nested'
-		}))
-		.pipe(pkg.plumber({
-			errorHandler: pkg.notify.onError('Error: <%= error.message %>')
-		}))
-		.pipe(pkg.autoprefixer({
-			browsers: [ 'last 3 versions', '> 1%',  'Firefox ESR', 'Opera 12.1']
-		}))
-		.pipe(pkg.revReplace({
-			manifest: gulp.src("./rev/manifest.img.json")
-		}))
-		.pipe(gulp.dest(pathConfig.dist))
-		.pipe(browserSync.reload({
-			stream: true
-		}))
-		.pipe(pkg.rename(function (file) {
-			file.dirname = file.dirname;
-		})), manifest.css);
-});
-// 编译Html
-gulp.task('build-dist-html', function () {
-	// var deferred = Q.defer();
-	mkRev(gulp.src(pathConfig.src + '**/*.html', {
-			base: pathConfig.src
-		})
-		.pipe(pkg.plumber())
-		.pipe(pkg.fileInclude({
-			prefix: '@@',
-			basepath: '@file'
-		}))
-		.pipe(pkg.htmlmin({
-			collapseWhitespace: true,
-			removeComments: true
-		}))
-		.pipe(gulp.dest(pathConfig.dist))
-		.pipe(browserSync.reload({
-			stream: true
-		}))
-		.pipe(pkg.rename(function (file) {
-			file.dirname = file.dirname;
-		})), manifest.html);
-});
-// 编译Js
 
-gulp.task('build-dist-js', function () {
-	return mkRev(gulp.src([pathConfig.src + 'js/**/*.*'])
-		.pipe(pkg.if(condition, template(api)))
-		.pipe(pkg.if(js_uglify, pkg.uglify().on('error', function(err){
-			console.log(err);
-		})))
-		.pipe(gulp.dest(pathConfig.dist))
-		.pipe(browserSync.reload({
-			stream: true
-		}))
-		.pipe(pkg.rename(function (file) {
-			file.dirname = file.dirname;
-		})), manifest.js);
-});
-//合并
-gulp.task('build-rep-rev', ['build-dist-html', 'build-dist-js'], function () {
-	return gulp.src([
-			pathConfig.dist + '**/*.html'
-		])
-		.pipe(pkg.revReplace({
-			manifest: gulp.src("./rev/*.*")
-		}))
-		.pipe(gulp.dest(pathConfig.dist));
-});
-gulp.task('default', ['setValue', 'build-dist-img', 'build-dist-sass', 'build-dist-js', 'build-dist-html']);
-gulp.task('default1', ['setValue', 'build-dist-sass', 'build-rep-rev']);
-gulp.task('rev', ['del-dist','build-dist-img'], function () {
-	gulp.start('default1');
-});
+// 监听文件变化（'add', 'change', 'unlink'）
 gulp.task('watch', function () {
-	gulp.watch(pathConfig.src + 'css/*.*', ['build-dist-sass']);
-	gulp.watch(pathConfig.src + '**/*.html', ['build-dist-html']);
-	gulp.watch(pathConfig.src + 'js/**/*.*', ['build-dist-js']);
+    w(html_path, 'html');
+    w(js_libs_path, 'js_libs');
+    w(js_main_path, 'js_main');
+    w(css_libs_path, 'css_libs');
+    w(css_main_path, 'css_main');
+    w(images_path, 'images');
+    w(fonts_path, 'fonts');
+
+    function w(path, task){
+        watch(path, function () {
+            runSequence(task, 'browser_reload'); // 打包完成后，再刷新浏览器。监听任务不要带cb参数，否则会报错：回调次数太多
+        });
+    }
+});
+
+// 开发环境
+gulp.task('dev', function(cb) {
+    set_env('dev');
+    runSequence(
+        ['clean'],
+        ['html', 'js_libs', 'js_main', 'css_libs', 'css_main', 'images', 'fonts'],
+        ['browser', 'watch'],
+        cb);
+});
+
+// 生产环境
+gulp.task('build', function(cb) {
+    set_env('build');
+    runSequence(
+        ['clean'],  // 首先清理文件，否则会把新打包的文件清掉
+        ['html', 'js_libs', 'js_main', 'css_libs', 'css_main', 'images', 'fonts'], // 不分先后的任务最好并行执行，提高效率
+        ['rev'], // 所有文件打包完毕之后开始生成版本清单文件
+        ['set_version', 'version.txt'], // 根据清单文件替换html里的资源文件
+        cb);
 });
