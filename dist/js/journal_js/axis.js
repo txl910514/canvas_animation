@@ -51,6 +51,26 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
         axisLabel: {
           strokeStyle: '#333',
           textAlign: 'center'
+        },
+        axisSplitLine: {
+          lineWidth: 1,
+          strokeStyle: '#6e6'
+        }
+      },
+      yAxis: {
+        splitNumber: 2,
+        axisTick: {
+          lineWidth: 1,
+          strokeStyle: '#333',
+          lengh: 5
+        },
+        axisLabel: {
+          strokeStyle: '#333',
+          textAlign: 'center'
+        },
+        axisSplitLine: {
+          lineWidth: 1,
+          strokeStyle: '#6e6'
         }
       },
       star: {
@@ -126,6 +146,7 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
       this.vertexTopArrow();
       this.vertexRightArrow();
       this.xAxisSplit();
+      this.yAxisSplit();
 
       for (var i = 0; i < starData.length; i++) {
         (function (i) {
@@ -140,8 +161,9 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
       this.ctx.lineTo(this.vertexRight.x, this.vertexRight.y);
       this.ctx.stroke();
     },
+    strokeSplit: function strokeSplit(axisText) {},
     xAxisSplit: function xAxisSplit() {
-      var splitNum = Math.ceil(this.xMax / this.options.xAxis.splitNumber) + 1;
+      var splitNum = Math.floor(this.xMax / this.options.xAxis.splitNumber) + 1;
 
       for (var i = 0; i < splitNum; i++) {
         this.ctx.lineWidth = this.options.xAxis.axisTick.lineWidth;
@@ -159,6 +181,47 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
         this.ctx.strokeText(i * this.options.xAxis.splitNumber, this.origin.x + i * this.xAxisAve * this.options.xAxis.splitNumber, this.origin.y + this.options.xAxis.axisTick.lengh + 15);
         this.ctx.closePath();
         this.ctx.stroke();
+
+        if (i !== 0) {
+          this.ctx.lineWidth = this.options.xAxis.axisSplitLine.lineWidth;
+          this.ctx.strokeStyle = this.options.xAxis.axisSplitLine.strokeStyle;
+          this.ctx.beginPath();
+          this.ctx.moveTo(this.origin.x + i * this.xAxisAve * this.options.xAxis.splitNumber, this.origin.y);
+          this.ctx.lineTo(this.origin.x + i * this.xAxisAve * this.options.xAxis.splitNumber, this.vertexTop.y);
+          this.ctx.closePath();
+          this.ctx.stroke();
+        }
+      }
+    },
+    yAxisSplit: function yAxisSplit() {
+      var splitNum = Math.floor(this.yMax / this.options.yAxis.splitNumber) + 1;
+
+      for (var i = 0; i < splitNum; i++) {
+        this.ctx.lineWidth = this.options.yAxis.axisTick.lineWidth;
+        this.ctx.strokeStyle = this.options.yAxis.axisTick.strokeStyle;
+        this.ctx.beginPath();
+        this.ctx.moveTo(this.origin.x, this.origin.y - i * this.yAxisAve * this.options.yAxis.splitNumber);
+        this.ctx.lineTo(this.origin.x - this.options.yAxis.axisTick.lengh, this.origin.y - i * this.yAxisAve * this.options.yAxis.splitNumber);
+        this.ctx.closePath();
+        this.ctx.stroke();
+        this.ctx.strokeStyle = this.options.yAxis.axisLabel.strokeStyle;
+        this.ctx.lineWidth = 1; // this.ctx.textAlign = this.options.yAxis.axisLabel.textAlign;
+
+        this.ctx.beginPath();
+        this.ctx.font = "15px Arial";
+        this.ctx.strokeText(i * this.options.yAxis.splitNumber, this.origin.x - this.options.yAxis.axisTick.lengh - 15, this.origin.y - i * this.yAxisAve * this.options.yAxis.splitNumber + 5);
+        this.ctx.closePath();
+        this.ctx.stroke();
+
+        if (i !== 0) {
+          this.ctx.lineWidth = this.options.yAxis.axisSplitLine.lineWidth;
+          this.ctx.strokeStyle = this.options.yAxis.axisSplitLine.strokeStyle;
+          this.ctx.beginPath();
+          this.ctx.moveTo(this.origin.x + i * this.yAxisAve * this.options.yAxis.splitNumber, this.origin.y);
+          this.ctx.lineTo(this.origin.x + i * this.yAxisAve * this.options.yAxis.splitNumber, this.vertexTop.y);
+          this.ctx.closePath();
+          this.ctx.stroke();
+        }
       }
     },
     strokeStar: function strokeStar(centerPos) {
