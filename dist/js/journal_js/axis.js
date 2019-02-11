@@ -42,7 +42,7 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
         height: 20
       },
       xAxis: {
-        splitNumber: 2,
+        splitNumber: 5,
         axisTick: {
           lineWidth: 1,
           strokeStyle: '#333',
@@ -54,11 +54,11 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
         },
         axisSplitLine: {
           lineWidth: 1,
-          strokeStyle: '#6e6'
+          strokeStyle: '#eee'
         }
       },
       yAxis: {
-        splitNumber: 2,
+        splitNumber: 5,
         axisTick: {
           lineWidth: 1,
           strokeStyle: '#333',
@@ -70,7 +70,7 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
         },
         axisSplitLine: {
           lineWidth: 1,
-          strokeStyle: '#6e6'
+          strokeStyle: '#eee'
         }
       },
       star: {
@@ -142,11 +142,14 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
       this.yAxisAve = yAxisAve;
       this.xMax = xMax;
       this.yMax = yMax;
+      this.options.xAxis.splitData = Math.ceil(xMax / this.options.xAxis.splitNumber);
+      this.options.yAxis.splitData = Math.ceil(yMax / this.options.yAxis.splitNumber);
       this.strokeAxis();
       this.vertexTopArrow();
       this.vertexRightArrow();
       this.xAxisSplit();
       this.yAxisSplit();
+      console.log(this);
 
       for (var i = 0; i < starData.length; i++) {
         (function (i) {
@@ -163,22 +166,22 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
     },
     strokeSplit: function strokeSplit(axisText) {},
     xAxisSplit: function xAxisSplit() {
-      var splitNum = Math.floor(this.xMax / this.options.xAxis.splitNumber) + 1;
+      var splitNum = Math.floor(this.xMax / this.options.xAxis.splitData) + 1;
 
       for (var i = 0; i < splitNum; i++) {
         this.ctx.lineWidth = this.options.xAxis.axisTick.lineWidth;
         this.ctx.strokeStyle = this.options.xAxis.axisTick.strokeStyle;
         this.ctx.beginPath();
-        this.ctx.moveTo(this.origin.x + i * this.xAxisAve * this.options.xAxis.splitNumber, this.origin.y);
-        this.ctx.lineTo(this.origin.x + i * this.xAxisAve * this.options.xAxis.splitNumber, this.origin.y + this.options.xAxis.axisTick.lengh);
+        this.ctx.moveTo(this.origin.x + i * this.xAxisAve * this.options.xAxis.splitData, this.origin.y);
+        this.ctx.lineTo(this.origin.x + i * this.xAxisAve * this.options.xAxis.splitData, this.origin.y + this.options.xAxis.axisTick.lengh);
         this.ctx.closePath();
         this.ctx.stroke();
         this.ctx.strokeStyle = this.options.xAxis.axisLabel.strokeStyle;
         this.ctx.lineWidth = 1;
         this.ctx.textAlign = this.options.xAxis.axisLabel.textAlign;
         this.ctx.beginPath();
-        this.ctx.font = "15px Arial";
-        this.ctx.strokeText(i * this.options.xAxis.splitNumber, this.origin.x + i * this.xAxisAve * this.options.xAxis.splitNumber, this.origin.y + this.options.xAxis.axisTick.lengh + 15);
+        this.ctx.font = "15px";
+        this.ctx.strokeText(i * this.options.xAxis.splitData, this.origin.x + i * this.xAxisAve * this.options.xAxis.splitData, this.origin.y + this.options.xAxis.axisTick.lengh + 15);
         this.ctx.closePath();
         this.ctx.stroke();
 
@@ -186,30 +189,40 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
           this.ctx.lineWidth = this.options.xAxis.axisSplitLine.lineWidth;
           this.ctx.strokeStyle = this.options.xAxis.axisSplitLine.strokeStyle;
           this.ctx.beginPath();
-          this.ctx.moveTo(this.origin.x + i * this.xAxisAve * this.options.xAxis.splitNumber, this.origin.y);
-          this.ctx.lineTo(this.origin.x + i * this.xAxisAve * this.options.xAxis.splitNumber, this.vertexTop.y);
+          this.ctx.moveTo(this.origin.x + i * this.xAxisAve * this.options.xAxis.splitData, this.origin.y);
+          this.ctx.lineTo(this.origin.x + i * this.xAxisAve * this.options.xAxis.splitData, this.vertexTop.y);
           this.ctx.closePath();
           this.ctx.stroke();
+
+          if (i === splitNum - 1) {
+            if (this.origin.x + i * this.xAxisAve * this.options.xAxis.splitData < this.vertexRight.x) {
+              this.ctx.beginPath();
+              this.ctx.moveTo(this.vertexRight.x, this.origin.y);
+              this.ctx.lineTo(this.vertexRight.x, this.vertexTop.y);
+              this.ctx.closePath();
+              this.ctx.stroke();
+            }
+          }
         }
       }
     },
     yAxisSplit: function yAxisSplit() {
-      var splitNum = Math.floor(this.yMax / this.options.yAxis.splitNumber) + 1;
+      var splitNum = Math.floor(this.yMax / this.options.yAxis.splitData) + 1;
 
       for (var i = 0; i < splitNum; i++) {
         this.ctx.lineWidth = this.options.yAxis.axisTick.lineWidth;
         this.ctx.strokeStyle = this.options.yAxis.axisTick.strokeStyle;
         this.ctx.beginPath();
-        this.ctx.moveTo(this.origin.x, this.origin.y - i * this.yAxisAve * this.options.yAxis.splitNumber);
-        this.ctx.lineTo(this.origin.x - this.options.yAxis.axisTick.lengh, this.origin.y - i * this.yAxisAve * this.options.yAxis.splitNumber);
+        this.ctx.moveTo(this.origin.x, this.origin.y - i * this.yAxisAve * this.options.yAxis.splitData);
+        this.ctx.lineTo(this.origin.x - this.options.yAxis.axisTick.lengh, this.origin.y - i * this.yAxisAve * this.options.yAxis.splitData);
         this.ctx.closePath();
         this.ctx.stroke();
         this.ctx.strokeStyle = this.options.yAxis.axisLabel.strokeStyle;
         this.ctx.lineWidth = 1; // this.ctx.textAlign = this.options.yAxis.axisLabel.textAlign;
 
         this.ctx.beginPath();
-        this.ctx.font = "15px Arial";
-        this.ctx.strokeText(i * this.options.yAxis.splitNumber, this.origin.x - this.options.yAxis.axisTick.lengh - 15, this.origin.y - i * this.yAxisAve * this.options.yAxis.splitNumber + 5);
+        this.ctx.font = "15px";
+        this.ctx.strokeText(i * this.options.yAxis.splitData, this.origin.x - this.options.yAxis.axisTick.lengh - 15, this.origin.y - i * this.yAxisAve * this.options.yAxis.splitData + 5);
         this.ctx.closePath();
         this.ctx.stroke();
 
@@ -217,10 +230,22 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
           this.ctx.lineWidth = this.options.yAxis.axisSplitLine.lineWidth;
           this.ctx.strokeStyle = this.options.yAxis.axisSplitLine.strokeStyle;
           this.ctx.beginPath();
-          this.ctx.moveTo(this.origin.x + i * this.yAxisAve * this.options.yAxis.splitNumber, this.origin.y);
-          this.ctx.lineTo(this.origin.x + i * this.yAxisAve * this.options.yAxis.splitNumber, this.vertexTop.y);
+          this.ctx.moveTo(this.origin.x, this.origin.y - i * this.yAxisAve * this.options.yAxis.splitData);
+          this.ctx.lineTo(this.vertexRight.x, this.origin.y - i * this.yAxisAve * this.options.yAxis.splitData);
           this.ctx.closePath();
           this.ctx.stroke();
+          console.log(i);
+          console.log(splitNum - 1);
+
+          if (i === splitNum - 1) {
+            if (this.origin.y - i * this.yAxisAve * this.options.yAxis.splitData > this.vertexTop.y) {
+              this.ctx.beginPath();
+              this.ctx.moveTo(this.origin.x, this.vertexTop.y);
+              this.ctx.lineTo(this.vertexRight.x, this.vertexTop.y);
+              this.ctx.closePath();
+              this.ctx.stroke();
+            }
+          }
         }
       }
     },
@@ -228,8 +253,8 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
       this.ctx.beginPath();
 
       for (var i = 0; i < 5; i++) {
-        this.ctx.lineTo(Math.cos((18 + i * 72) / 180 * Math.PI) * this.options.star.R + centerPos.x * this.xAxisAve + this.vertexTop.x, -Math.sin((18 + i * 72) / 180 * Math.PI) * this.options.star.R + centerPos.y * this.yAxisAve - this.options.star.R);
-        this.ctx.lineTo(Math.cos((54 + i * 72) / 180 * Math.PI) * this.options.star.R / 2 + centerPos.x * this.xAxisAve + this.vertexTop.x, -Math.sin((54 + i * 72) / 180 * Math.PI) * this.options.star.R / 2 + centerPos.y * this.yAxisAve - this.options.star.R);
+        this.ctx.lineTo(Math.cos((18 + i * 72) / 180 * Math.PI) * this.options.star.R + centerPos.x * this.xAxisAve + this.vertexTop.x, -Math.sin((18 + i * 72) / 180 * Math.PI) * this.options.star.R + this.origin.y - centerPos.y * this.yAxisAve);
+        this.ctx.lineTo(Math.cos((54 + i * 72) / 180 * Math.PI) * this.options.star.R / 2 + centerPos.x * this.xAxisAve + this.vertexTop.x, -Math.sin((54 + i * 72) / 180 * Math.PI) * this.options.star.R / 2 + this.origin.y - centerPos.y * this.yAxisAve);
       }
 
       this.ctx.closePath(); //设置边框样式以及填充颜色       
