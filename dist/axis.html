@@ -69,21 +69,49 @@
 					y: 13
 				}
 			],
-			lineData: [{
-					x: 10,
-					y: 15
-				},
-				{
-					x: 12,
-					y: 14
-				}
-			],
+			lineData: [],
 			starLineData: []
 		}
 		var AxisFunc = new Axis({
 			canvas: canvas
 		})
+		options.custom = [
+			function(ctx) {
+				console.log(ctx);
+			}
+		]
 		AxisFunc.setOption(options);
+
+		function getRandom(n, m) {
+			var n = Number(n); //强制转换成数字
+			var m = Number(m);
+			if (isNaN(n) || isNaN(m)) { //判断是否为有效数字 ，其中一个不是有效数字就返回[0,1)之间的随机小数
+				return math.random();
+			}
+			if (n > m) { //如果n>m则交换
+				var temp = n;
+				n = m;
+				m = temp;
+			}
+			return Math.round(Math.random() * (m - n) + n);
+		}
+		var x = 0,
+			y = 0,
+			noLineStar = 0,
+			starLineData = JSON.parse(JSON.stringify(options.starData));
+		setInterval(function() {
+			starLineData = JSON.parse(JSON.stringify(options.starData));
+			x = getRandom(18, 24);
+			y = getRandom(6, 12);
+			noLineStar = getRandom(0, 4);
+			starLineData.splice(noLineStar, 1);
+			options.lineData.push({
+				x: x,
+				y: y
+			})
+			options.starLineData = starLineData;
+			AxisFunc.setOption(options);
+		}, 60 * 1000)
 	}
 </script>
 
