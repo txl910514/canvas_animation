@@ -67,6 +67,10 @@
                 {
                     x: 11,
                     y: 13
+                },
+                {
+                    x: 16,
+                    y: 15
                 }
             ],
             lineData: [],
@@ -77,7 +81,104 @@
         })
         options.custom = [
             function (ctx) {
-                console.log(ctx);
+                var getAxisVertex = AxisFunc.getAxisVertex();
+                console.log(AxisFunc);
+                var point1 = AxisFunc.getAxisPoint({x:24, y:12});
+                var point2 = AxisFunc.getAxisPoint({x:32, y:12});
+                ctx.lineWidth = 4;
+                ctx.strokeStyle = '#40E0D0';
+                ctx.beginPath();
+                ctx.moveTo(getAxisVertex.origin.x, getAxisVertex.origin.y);
+                ctx.lineTo(getAxisVertex.vertexTop.x, getAxisVertex.vertexTop.y);
+                ctx.lineTo(point1.x, getAxisVertex.vertexTop.y);
+                ctx.lineTo(point1.x, point1.y);
+                ctx.stroke();
+                ctx.strokeStyle = 'red';
+                ctx.beginPath();
+                ctx.moveTo(point1.x, point1.y);
+                ctx.lineTo(point2.x, point2.y);
+                ctx.stroke();
+                ctx.strokeStyle = '#40E0D0';
+                ctx.beginPath();
+                ctx.moveTo(point2.x, point2.y);
+                ctx.lineTo(getAxisVertex.vertexRight.x, point1.y);
+                ctx.lineTo(getAxisVertex.vertexRight.x, getAxisVertex.vertexRight.y);
+                ctx.lineTo(getAxisVertex.origin.x, getAxisVertex.origin.y);
+                ctx.stroke();
+                ctx.font = "80px Helvetica";
+                ctx.lineWidth = 1;
+                ctx.fillStyle = 'red';
+                ctx.textAlign="left";
+                ctx.beginPath();
+                ctx.fillText( 'Door',  point1.x + (point2.x -point1.x - ctx.measureText('Door').width) / 2, point1.y - 10);
+            },
+            function (ctx) {
+                var point1 = AxisFunc.getAxisPoint({x:8, y:3});
+                var point2 = AxisFunc.getAxisPoint({x:8, y:6});
+                var point3 = AxisFunc.getAxisPoint({x:16, y:6});
+                var point4 = AxisFunc.getAxisPoint({x:16, y:3});
+                ctx.lineWidth = 1;
+                ctx.strokeStyle = '#666';
+                ctx.fillStyle = '#666';
+                ctx.beginPath();
+                ctx.moveTo(point1.x, point1.y);
+                ctx.lineTo(point2.x, point2.y);
+                ctx.lineTo(point3.x, point3.y);
+                ctx.lineTo(point4.x, point4.y);
+                ctx.lineTo(point1.x, point1.y);
+                ctx.stroke();
+                ctx.fill();
+                ctx.font = "40px Helvetica";
+                ctx.lineWidth = 1;
+                ctx.fillStyle = 'red';
+                ctx.textAlign="center";
+                ctx.textBaseline = "middle";
+                ctx.fillText( 'TABLE',  point1.x + (point3.x - point1.x) / 2, point2.y + (point4.y - point3.y) / 2);
+
+                var point5 = AxisFunc.getAxisPoint({x:24, y:3});
+                var point6 = AxisFunc.getAxisPoint({x:24, y:6});
+                var point7 = AxisFunc.getAxisPoint({x:32, y:6});
+                var point8 = AxisFunc.getAxisPoint({x:32, y:3});
+                ctx.lineWidth = 1;
+                ctx.strokeStyle = '#666';
+                ctx.fillStyle = '#666';
+                ctx.beginPath();
+                ctx.moveTo(point5.x, point5.y);
+                ctx.lineTo(point6.x, point6.y);
+                ctx.lineTo(point7.x, point7.y);
+                ctx.lineTo(point8.x, point8.y);
+                ctx.lineTo(point5.x, point5.y);
+                ctx.stroke();
+                ctx.fill();
+                ctx.font = "40px Helvetica";
+                ctx.lineWidth = 1;
+                ctx.fillStyle = 'red';
+                ctx.textAlign="center";
+                ctx.textBaseline = "middle";
+                ctx.fillText( 'TABLE',  point5.x + (point7.x - point5.x) / 2, point6.y + (point8.y - point7.y) / 2);
+            },
+            function (ctx) {
+                var point1 = AxisFunc.getAxisPoint({x:2, y:11});
+                var point2 = AxisFunc.getAxisPoint({x:2, y:14});
+                var point3 = AxisFunc.getAxisPoint({x:12, y:14});
+                var point4 = AxisFunc.getAxisPoint({x:12, y:11});
+                ctx.lineWidth = 1;
+                ctx.strokeStyle = '#666';
+                ctx.fillStyle = '#666';
+                ctx.beginPath();
+                ctx.moveTo(point1.x, point1.y);
+                ctx.lineTo(point2.x, point2.y);
+                ctx.lineTo(point3.x, point3.y);
+                ctx.lineTo(point4.x, point4.y);
+                ctx.lineTo(point1.x, point1.y);
+                ctx.stroke();
+                ctx.fill();
+                ctx.font = "40px Helvetica";
+                ctx.lineWidth = 1;
+                ctx.fillStyle = 'red';
+                ctx.textAlign="center";
+                ctx.textBaseline = "middle";
+                ctx.fillText( 'Floor Plan at PQ504',  point1.x + (point3.x - point1.x) / 2, point2.y + (point4.y - point3.y) / 2);
             }
         ]
         AxisFunc.setOption(options);
@@ -96,11 +197,14 @@
             return Math.round(Math.random() * (m - n) + n);
 
         }
-        var x =0, y = 0, noLineStar = 0, starLineData = JSON.parse(JSON.stringify(options.starData));
+        var x = 0,
+            y = 0,
+            noLineStar = 0,
+            starLineData = JSON.parse(JSON.stringify(options.starData));
         setInterval(function () {
             starLineData = JSON.parse(JSON.stringify(options.starData));
             x = getRandom(18, 24);
-            y= getRandom(6, 12);
+            y = getRandom(6, 12);
             noLineStar = getRandom(0, 4);
             starLineData.splice(noLineStar, 1);
             options.lineData.push({

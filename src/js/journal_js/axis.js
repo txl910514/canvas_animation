@@ -35,7 +35,7 @@
                     length: 5     
                 },
                 axisLabel: {
-                    strokeStyle: '#333',
+                    fillStyle: '#333',
                     textAlign:'center'
                 },
                 axisSplitLine: {
@@ -51,7 +51,7 @@
                     length: 5     
                 },
                 axisLabel: {
-                    strokeStyle: '#333',
+                    fillStyle: '#333',
                     textAlign:'center'
                 },
                 axisSplitLine: {
@@ -121,11 +121,23 @@
             mergeOptions(option, this.options);
             requestAnimationFrame(this.animate.bind(this));
         }
+        this.getAxisVertex = function () {
+            return {
+                vertexTop: this.vertexTop,
+                origin: this.origin,
+                vertexRight: this.vertexRight
+            }
+        }
+        this.getAxisPoint = function (point) {
+            return {
+                x: this.origin.x + this.xAxisAve * point.x,
+                y: this.origin.y - this.yAxisAve * point.y
+            }
+        }
         this.checkRequestAnimationFrame();
     }
 
     Axis.prototype = {
-        setAutoDrawFunc: [],
         initAxis: function () {
             var that = this;
             var starData = this.options.starData || [];
@@ -146,15 +158,16 @@
             this.vertexTopArrow();
             this.vertexRightArrow();
             this.strokeAxis();
-            this.autoDraw();
             this.xAxisSplit();
             this.yAxisSplit();
+            this.autoDraw();
             this.strokeDotLine();
             for (var i = 0; i < starData.length; i++) {
                 (function (i) {
                     that.strokeStar(starData[i]);
                 })(i)
             }
+
         },
         autoDraw: function () {
             var custom = this.options.custom || [];
@@ -187,9 +200,9 @@
                     this.ctx.fillStyle = this.options.dotLine.dot.fillStyle;  
                     this.ctx.beginPath();
                     this.ctx.arc(this.origin.x + this.xAxisAve * lineData[i].x, this.origin.y - this.yAxisAve * lineData[i].y, this.options.dotLine.dot.R,0,2*Math.PI);
-                    this.ctx.strokeStyle = this.options.dotLine.dot.label.strokeStyle; 
-                    this.ctx.font = "15px";
-                    this.ctx.strokeText( i,  this.origin.x + this.xAxisAve * lineData[i].x + 2 * this.options.dotLine.dot.R, this.origin.y - this.yAxisAve * lineData[i].y - 2 * this.options.dotLine.dot.R);
+                    this.ctx.fillStyle = this.options.dotLine.dot.label.strokeStyle; 
+                    this.ctx.font = "12px Helvetica";
+                    this.ctx.fillText( i,  this.origin.x + this.xAxisAve * lineData[i].x + 2 * this.options.dotLine.dot.R, this.origin.y - this.yAxisAve * lineData[i].y - 2 * this.options.dotLine.dot.R);
                     this.ctx.closePath();
                     this.ctx.fill(); 
                     this.ctx.stroke();
@@ -228,12 +241,12 @@
                 this.ctx.lineTo(this.origin.x + i * this.xAxisAve * this.options.xAxis.splitData, this.origin.y + this.options.xAxis.axisTick.length);
                 this.ctx.closePath();
                 this.ctx.stroke();
-                this.ctx.strokeStyle = this.options.xAxis.axisLabel.strokeStyle;
+                this.ctx.fillStyle = this.options.xAxis.axisLabel.fillStyle;
                 this.ctx.lineWidth= 1; 
                 this.ctx.textAlign = this.options.xAxis.axisLabel.textAlign;
                 this.ctx.beginPath();
-                this.ctx.font = "15px";
-                this.ctx.strokeText( i * this.options.xAxis.splitData,  this.origin.x + i * this.xAxisAve * this.options.xAxis.splitData, this.origin.y + this.options.xAxis.axisTick.length + 15);
+                this.ctx.font = "12px Helvetica";
+                this.ctx.fillText( i * this.options.xAxis.splitData,  this.origin.x + i * this.xAxisAve * this.options.xAxis.splitData, this.origin.y + this.options.xAxis.axisTick.length + 15);
                 this.ctx.closePath();
                 this.ctx.stroke();
                 if (i !== 0) {
@@ -268,12 +281,12 @@
                 this.ctx.lineTo(this.origin.x - this.options.yAxis.axisTick.length, this.origin.y - i * this.yAxisAve * this.options.yAxis.splitData );
                 this.ctx.closePath();
                 this.ctx.stroke();
-                this.ctx.strokeStyle = this.options.yAxis.axisLabel.strokeStyle;
+                this.ctx.fillStyle = this.options.yAxis.axisLabel.fillStyle;
                 this.ctx.lineWidth= 1; 
-                // this.ctx.textAlign = this.options.yAxis.axisLabel.textAlign;
+                this.ctx.textAlign = this.options.yAxis.axisLabel.textAlign;
                 this.ctx.beginPath();
-                this.ctx.font = "15px";
-                this.ctx.strokeText( i * this.options.yAxis.splitData,  this.origin.x - this.options.yAxis.axisTick.length - 15, this.origin.y - i * this.yAxisAve * this.options.yAxis.splitData + 5);
+                this.ctx.font = "12px Helvetica";
+                this.ctx.fillText( i * this.options.yAxis.splitData,  this.origin.x - this.options.yAxis.axisTick.length - 15, this.origin.y - i * this.yAxisAve * this.options.yAxis.splitData + 5);
                 this.ctx.closePath();
                 this.ctx.stroke();
                 if (i !== 0) {
