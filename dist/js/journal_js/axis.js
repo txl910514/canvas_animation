@@ -151,6 +151,32 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
       };
     };
 
+    this.canvasTextAutoLine = function (text, x, y, roomWidth, fontSize) {
+      var lineWidth = 0;
+      var lastSubStrIndex = 0;
+      console.log(this.ctx.measureText(text));
+
+      if (this.ctx.measureText(text).width < roomWidth) {
+        this.ctx.fillText(text, x, y);
+      } else {
+        for (var i = 0; i < text.length; i++) {
+          lineWidth += this.ctx.measureText(text[i]).width;
+
+          if (lineWidth > roomWidth - 10) {
+            //减去initX,防止边界出现的问题
+            this.ctx.fillText(text.substring(lastSubStrIndex, i), x, y - fontSize / 2);
+            y += fontSize / 2;
+            lineWidth = 0;
+            lastSubStrIndex = i;
+          }
+
+          if (i == text.length - 1) {
+            this.ctx.fillText(text.substring(lastSubStrIndex, i + 1), x, y);
+          }
+        }
+      }
+    };
+
     this.checkRequestAnimationFrame();
   };
 

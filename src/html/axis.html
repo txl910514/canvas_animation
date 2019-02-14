@@ -109,8 +109,9 @@
                 ctx.lineWidth = 1;
                 ctx.fillStyle = 'red';
                 ctx.textAlign="left";
+                ctx.textBaseline = "bottom";
                 ctx.beginPath();
-                ctx.fillText( 'Door',  point1.x + (point2.x -point1.x - ctx.measureText('Door').width) / 2, point1.y - 10);
+                ctx.fillText( 'Door',  point1.x + (point2.x -point1.x - ctx.measureText('Door').width) / 2, point1.y);
             },
             function (ctx) {
                 var point1 = AxisFunc.getAxisPoint({x:8, y:3});
@@ -178,7 +179,7 @@
                 ctx.fillStyle = 'red';
                 ctx.textAlign="center";
                 ctx.textBaseline = "middle";
-                ctx.fillText( 'Floor Plan at PQ504',  point1.x + (point3.x - point1.x) / 2, point2.y + (point4.y - point3.y) / 2);
+                AxisFunc.canvasTextAutoLine('Floor Plan at PQ504', point1.x + (point3.x - point1.x) / 2, point2.y + (point4.y - point3.y) / 2, point3.x - point2.x, 40);
             }
         ]
         AxisFunc.setOption(options);
