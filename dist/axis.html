@@ -82,7 +82,6 @@
 		options.custom = [
 			function(ctx) {
 				var getAxisVertex = AxisFunc.getAxisVertex();
-				console.log(AxisFunc);
 				var point1 = AxisFunc.getAxisPoint({
 					x: 24,
 					y: 12
@@ -223,8 +222,7 @@
 				AxisFunc.canvasTextAutoLine('Floor Plan at PQ504', point1.x + (point3.x - point1.x) / 2, point2.y + (point4.y - point3.y) / 2, point3.x - point2.x, 40);
 			}
 		]
-		AxisFunc.setOption(options);
-
+		// AxisFunc.setOption(options);
 		function getRandom(n, m) {
 			var n = Number(n); //强制转换成数字
 			var m = Number(m);

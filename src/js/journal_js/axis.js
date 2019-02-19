@@ -92,27 +92,27 @@
             })
         }
         mergeOptions(options, this.options);
-        this.canvas = options.canvas;
-        this.scaleAdaption = 1;
-        this.ctx = this.canvas.getContext("2d");
+        Axis.prototype.canvas = options.canvas;
+        Axis.prototype.scaleAdaption = 1;
+        Axis.prototype.ctx = this.canvas.getContext("2d");
 
         this.ctx.lineWidth = 2;
         var pageWidth = parseInt(this.canvas.clientWidth);
         var pageHeight = parseInt(this.canvas.clientHeight);
-        this.pageWidth = pageWidth;
-        this.pageHeight = pageHeight;
+        Axis.prototype.pageWidth = pageWidth;
+        Axis.prototype.pageHeight = pageHeight;
         this.canvas.setAttribute("width", pageWidth * this.scaleAdaption);
         this.canvas.setAttribute("height", pageHeight * this.scaleAdaption);
-        this.vertexTop = {
+        Axis.prototype.vertexTop = {
             x: this.options.padding.left,
             y: this.options.padding.top
         }
-        this.origin = {
+        Axis.prototype.origin = {
             x: this.options.padding.left,
             y: pageHeight - this.options.padding.bottom
         }
 
-        this.vertexRight = {
+        Axis.prototype.vertexRight = {
             x: pageWidth - this.options.padding.left,
             y: pageHeight - this.options.padding.bottom
         }
@@ -137,7 +137,6 @@
         this.canvasTextAutoLine = function (text, x, y, roomWidth, fontSize) {
             var lineWidth = 0;
             var lastSubStrIndex= 0;
-            console.log(this.ctx.measureText(text));
             if (this.ctx.measureText(text).width < roomWidth) {
                 this.ctx.fillText( text, x, y);
             } else {
@@ -155,7 +154,7 @@
                 }
             }
         }
-        this.checkRequestAnimationFrame();
+        
     }
 
     Axis.prototype = {
@@ -169,10 +168,10 @@
             var yAxisLength = this.origin.y - this.vertexTop.y;
             var xAxisAve = xAxisLength / xMax;
             var yAxisAve = yAxisLength / yMax;
-            this.xAxisAve = xAxisAve;
-            this.yAxisAve = yAxisAve;
-            this.xMax = xMax;
-            this.yMax = yMax;
+            Axis.prototype.xAxisAve = xAxisAve;
+            Axis.prototype.yAxisAve = yAxisAve;
+            Axis.prototype.xMax = xMax;
+            Axis.prototype.yMax = yMax;
             this.options.xAxis.splitData = Math.ceil(xMax / this.options.xAxis.splitNumber);
             this.options.yAxis.splitData = Math.ceil(yMax / this.options.yAxis.splitNumber);
             
@@ -192,7 +191,6 @@
         },
         autoDraw: function () {
             var custom = this.options.custom || [];
-            console.log(custom);
             for (var i =0; i < custom.length; i++) {
                 typeof (custom[i]) === 'function' && custom[i](this.ctx);
             }
