@@ -6,3 +6,6 @@ canvas_animation
 * https://www.jb51.net/html5/443828.html canvas文本居中
 * https://blog.csdn.net/lishihong108/article/details/52483867?ref=myread
 * https://github.com/shiguang0116/gulp3-project
+* https://www.jianshu.com/p/5239fe681fe3  文本比对
+* https://github.com/google/diff-match-patch 文本比对
+* https://www.cnblogs.com/jpfss/p/9105119.html
