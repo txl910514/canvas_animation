@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>grid布局</title>
+    <style>
+        .grid_content1 {
+            display: grid;
+            grid-template-columns: 100px 100px 100px;
+            grid-template-rows: 100px;
+        }
+
+        .grid_content1 div {
+            background: #177;
+            color: #fff;
+            border: solid 1px #000;
+        }
+
+        .grid_content2 {
+            display: grid;
+            grid-template-columns: 33.33% 33.33% 33.33%;
+            /* grid-template-rows: 33.33% 33.33% 33.33%; */
+        }
+
+        .grid_content2 div {
+            background: #177;
+            color: #fff;
+            border: solid 1px #000;
+        }
+
+        .grid_content3 {
+            display: inline-grid;
+            grid-template-columns: repeat(8, 100px);
+            /* grid-template-rows: 33.33% 33.33% 33.33%; */
+        }
+
+        .grid_content4 {
+            grid-template-columns: repeat(3, 100px 72px 50px);
+        }
+
+        .grid_content5 {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, 100px);
+        }
+
+        .grid_content6 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .grid_content7 {
+            display: grid;
+            grid-template-columns: 100px 1fr 3fr;
+        }
+
+        .grid_content8 {
+            display: grid;
+            grid-template-columns: 100px 12fr minmax(200px, 1fr);
+        }
+
+        .grid_content3 div,
+        .grid_content5 div,
+        .grid_content6 div,
+        .grid_content7 div,
+        .grid_content8 div {
+            background: #177;
+            color: #fff;
+            border: solid 1px #000;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="grid_content1">
+        <div>
+            <p>1</p>
+        </div>
+        <div>
+            <p>2</p>
+        </div>
+        <div>
+            <p>3</p>
+        </div>
+    </div>
+    <div class="grid_content6">
+        <div>
+            <p>1</p>
+        </div>
+        <div>
+            <p>2</p>
+        </div>
+        <div>
+            <p>3</p>
+        </div>
+    </div>
+    <div class="grid_content7">
+        <div>
+            <p>1</p>
+        </div>
+        <div>
+            <p>2</p>
+        </div>
+        <div>
+            <p>3</p>
+        </div>
+    </div>
+    <div class="grid_content8">
+        <div>
+            <p>8-1</p>
+        </div>
+        <div>
+            <p>2</p>
+        </div>
+        <div>
+            <p>3</p>
+        </div>
+    </div>
+    <div class="grid_content2">
+        <div>
+            <p>1</p>
+        </div>
+        <div>
+            <p>2</p>
+        </div>
+        <div>
+            <p>3</p>
+        </div>
+    </div>
+    <div class="grid_content3">
+        <div>
+            <p>1</p>
+        </div>
+        <div>
+            <p>2</p>
+        </div>
+        <div>
+            <p>3</p>
+        </div>
+    </div>
+    <div class="grid_content3 grid_content4">
+        <div>
+            <p>1</p>
+        </div>
+        <div>
+            <p>2</p>
+        </div>
+        <div>
+            <p>3</p>
+        </div>
+    </div>
+    <div class="grid_content5">
+        <div>
+            <p>1</p>
+        </div>
+        <div>
+            <p>2</p>
+        </div>
+        <div>
+            <p>3</p>
+        </div>
+        <div>
+            <p>4</p>
+        </div>
+        <div>
+            <p>5</p>
+        </div>
+        <div>
+            <p>6</p>
+        </div>
+        <div>
+            <p>7</p>
+        </div>
+        <div>
+            <p>8</p>
+        </div>
+        <div>
+            <p>9</p>
+        </div>
+        <div>
+            <p>10</p>
+        </div>
+        <div>
+            <p>11</p>
+        </div>
+        <div>
+            <p>12</p>
+        </div>
+    </div>
+</body>
+
+</html>
